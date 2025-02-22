@@ -337,11 +337,11 @@ def _handle_prompt_interpolation(pairs: list[InputPair], length: int, clip: CLIP
                         continue
                     if holder is None:
                         holder = prev_holder
-                    real_prompt = apply_values_replace_to_prompt(pair.val, i, values_replace=values_replace)
+                    real_prompt = apply_values_replace_to_prompt(holder.raw_prompt, i, values_replace=values_replace)
                     if holder.prompt != real_prompt:
                         cond, pooled = clip.encode_from_tokens(clip.tokenize(real_prompt), return_pooled=True)
                         cond = pad_cond(cond, target_length=max_size)
-                        holder = CondHolder(idx=i, prompt=real_prompt, raw_prompt=pair.val, cond=cond, pooled=pooled, hold=pair.hold)
+                        holder = replace(holder, idx=i, prompt=real_prompt, cond=cond, pooled=pooled)
                     else:
                         holder = replace(holder)
                         holder.idx = i
